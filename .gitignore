@@ -1,0 +1,7 @@
+*.json
+*.pem
+*__pycache__
+*.pytest_cache
+exercise_1/exercise_1/output
+exercise_2/exercise_2/output
+*.DS_Store
