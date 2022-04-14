@@ -12,8 +12,7 @@ parser = argparse.ArgumentParser(description="Get parameters from CLI.")
 parser.add_argument(
     "--date",
     type=str,
-    help="Select the desired date to retrieve cryptos data. In case bulk_reprocess, this is the start_date",
-    required=True,
+    help="Select the desired date to retrieve cryptos data.",
 )
 parser.add_argument(
     "--coin",
@@ -22,13 +21,10 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
-    "--bulk_reprocess",
-    type=bool,
-    help="In case you want to retrieve more than 1 date",
-    default=False,
+    "--start_date", type=str, help="Date since you want to retrieve data (included)"
 )
 parser.add_argument(
-    "--end_date", type=str, help="Date until you want to retrieve data"
+    "--end_date", type=str, help="Date until you want to retrieve data (included)"
 )
 parser.add_argument(
     "--store_data_on_db",
@@ -76,12 +72,16 @@ def date_range(
 
 def main():
 
-    date = datetime.datetime.strptime(args.date, "%Y-%m-%d")
     coin = args.coin
-    bulk_reprocess = args.bulk_reprocess
     store_data_on_db = args.store_data_on_db
 
-    if not bulk_reprocess:
+    if not args.date:
+        if not args.start_date:
+            if not args.end_date:
+                raise ValueError("Please specify a date or a range with start_date and end_date!")
+
+    if args.date:
+        date = datetime.datetime.strptime(args.date, "%Y-%m-%d")
         coin_gecko = CoinGeckoWrapper(coin)
         coin_gecko.fetch_api_data(date)
         coin_gecko.store_on_filesystem(
@@ -96,10 +96,12 @@ def main():
             coin_gecko.upsert_aggregated_data_on_db()
 
     else:
+        if not args.start_date:
+            raise ValueError("Please specify an start_date!")
         if not args.end_date:
             raise ValueError("Please specify an end_date!")
 
-        start_date = datetime.datetime.strptime(args.date, "%Y-%m-%d")
+        start_date = datetime.datetime.strptime(args.start_date, "%Y-%m-%d")
         end_date = datetime.datetime.strptime(args.end_date, "%Y-%m-%d")
 
         if start_date > end_date:

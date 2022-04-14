@@ -34,6 +34,7 @@ build-backend = "poetry.core.masonry.api"
 Now we can install our Python app dependencies (and some dev dependencies also), by running the following commands:
 ```
 $ poetry add requests==2.26.0
+$ poetry add tqdm==4.60.0
 $ poetry add black --dev
 $ poetry add isort --dev
 $ poetry add pytest --dev
@@ -63,7 +64,14 @@ We can execute some examples to check if everything is fine:
 $ poetry run python exercise_1/main.py --date=2022-04-10 --coin=bitcoin
 ```
 
-To set up the cron job, we execute the following:
+To set up the cron job, I will execute it as a Python script (I didn't find the way to execute the Poetry app inside the crontab tab). So first I install 2 dependencies
+```
+$ pip3 install requests==2.26.0
+$ pip3 install tqdm==4.60.0
+```
+
+Now we are all set to create the cron job
+
 ```
 $ crontab -e
 ```
@@ -71,14 +79,16 @@ $ crontab -e
 it will open a vim editor, and there we input the following command:
 ```
 DATEVAR=date +20%y-%m-%d
-* 3 * * * python3 exercise_1/main.py --date=$($DATEVAR) --coin=bitcoin
-* 3 * * * python3 exercise_1/main.py --date=$($DATEVAR) --coin=ethereum
-* 3 * * * python3 exercise_1/main.py --date=$($DATEVAR) --coin=cardano
+* 3 * * * python3 exam-luciano-naveiro/exercise_1/exercise_1/main.py --date=$($DATEVAR) --coin=bitcoin
+* 3 * * * python3 exam-luciano-naveiro/exercise_1/exercise_1/main.py --date=$($DATEVAR) --coin=ethereum
+* 3 * * * python3 exam-luciano-naveiro/exercise_1/exercise_1/main.py --date=$($DATEVAR) --coin=cardano
 ```
 
-This will execute everyday at 3 AM and store the date for `bitcoin`, `ethereum` and `cardano`
+This will execute everyday at 3 AM and store the data for `bitcoin`, `ethereum` and `cardano`, on `exam-luciano-naveiro/exercise_1/exercise_1/output`
 
-For the Point 3, i will assume that each day's data should be stored separatelly, and I added `tqdm` to monitor the progress of the whole bulk reprocess.
+For the Point 3, i will assume that each day's data should be stored separatelly, and I added `tqdm` to monitor the progress of the whole bulk reprocess. I added the following parameters to the python app:
+- `start_date`: start date of the interval to retrieve data
+- `end_date`: date until data wants to be retrieved
 
 ## Exercise 2
 
@@ -126,6 +136,12 @@ I'll add some configuration on the `pyproject.toml` file:
 line-length = 79
 ```
 
+Also, here, to install it, just run:
+```
+$ poetry install
+```
+
+
 Now we can run some commands to clean the code:
 ```
 $ poetry run isort exercise_2
@@ -148,7 +164,7 @@ Now , I run `exercise_2/create_tables.py` to create 2 tables:
 $ poetry run python exercise_2/db/create_tables.py
 ```
 
-I added a new Boolean parameter on `main.py` called `store_data`, in case is `False`, it is just the same as the old `main.py` script. But in case is `True`, data is stored on both tables: `coin_raw` and `coin_aggregated`.
+I added a new Boolean parameter on `main.py` called `store_data_on_db`, in case is `False`, it is just the same as the old `main.py` script. But in case is `True`, data is stored on both tables: `coin_raw` and `coin_aggregated`.
 So the logic is as follows:
 - for `coin_raw`, it will store on the DB every new combination of `coin_id` and `date`
 - for `coin_aggregated`, it will first delete the record from the month belonging to the selected date, it will compute the max/min values again with the new data, and will store this new value.
@@ -156,9 +172,9 @@ So the logic is as follows:
 To populate the tables from values since 2020-01-01, I execute the following commands:
 
 ```
-$ poetry run python exercise_2/main.py --coin=bitcoin --date=2020-01-01 --store_data_on_db=True --bulk_reprocess=True --end_date=2022-04-14
-$ poetry run python exercise_2/main.py --coin=ethereum --date=2020-01-01 --store_data_on_db=True --bulk_reprocess=True --end_date=2022-04-14
-$ poetry run python exercise_2/main.py --coin=cardano --date=2020-01-01 --store_data_on_db=True --bulk_reprocess=True --end_date=2022-04-14
+$ poetry run python exercise_2/main.py --coin=bitcoin --start_date=2020-01-01 --end_date=2022-04-14 --store_data_on_db=True
+$ poetry run python exercise_2/main.py --coin=ethereum --start_date=2020-01-01 --end_date=2022-04-14 --store_data_on_db=True
+$ poetry run python exercise_2/main.py --coin=cardano --start_date=2020-01-01 --end_date=2022-04-14 --store_data_on_db=True
 ```
 
 ## Exercise 3
@@ -230,6 +246,12 @@ $ poetry add matplotlib==3.4.1
 $ poetry add holidays==0.13
 $ poetry add scikit-learn==0.24.2
 ```
+
+Again, to install it, just run:
+```
+$ poetry install
+```
+
 
 Now I can launch a Notebook and start working there:
 
