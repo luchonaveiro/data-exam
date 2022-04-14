@@ -50,6 +50,9 @@ logger = logging.getLogger(__name__)
 
 BASE_OUTPUT_PATH = os.path.join(os.path.dirname(__file__), 'output')
 
+if not os.path.isdir(BASE_OUTPUT_PATH):
+    os.mkdir(BASE_OUTPUT_PATH)
+
 
 def date_range(
     start_date: datetime.datetime, end_date: datetime.datetime

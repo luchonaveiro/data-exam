@@ -9,7 +9,7 @@ $ mkdir exercise_1/exercise_1
 $ mkdir exercise_1/exercise_1/output
 $ cd exercise_1
 $ touch exercise_1/__init__.py
-$ pip3 install poetry==1.1.8 ???
+$ pip3 install poetry==1.1.8
 $ poetry init
 ```
 
@@ -44,6 +44,11 @@ I'll add some configuration on the `pyproject.toml` file:
 ```
 [tool.black]
 line-length = 79
+```
+
+Once somebody clones this repo, as the project is already set up, the only requirement is to have Python 3.8 or higher. To install all the dependencies, you can run:
+```
+$ poetry install
 ```
 
 Now we can run some commands to clean the code:
