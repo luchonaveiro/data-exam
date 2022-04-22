@@ -2,13 +2,7 @@
 
 ## Exercise 1
 
-I will set up my environment using Poetry, to manage all the dependences and enable a reproduceable command line Python app. First, we should install poetry
-```
-$ pip3 install poetry==1.1.7
-$ pip3 install poetry-core==1.0.4
-```
-
-Now, I will instantiate the first project:
+I will instantiate the first project:
 
 ```
 $ cd exercise_1
@@ -50,21 +44,28 @@ I'll add some configuration on the `pyproject.toml` file:
 line-length = 79
 ```
 
-Once somebody clones this repo, the only requirement to run the app is having Python 3.8 or higher installed. To install all the app's dependencies, you can run:
-```
-$ poetry install
-```
-
 Now we can run some commands to clean the code:
 ```
 $ poetry run isort exercise_1
 $ poetry run black exercise_1
 ```
 
-We can execute some examples to check if everything is fine:
+To build this project, I will first crate a network where all the Docker containes will run:
 
 ```
-$ poetry run python exercise_1/main.py --date=2022-04-10 --coin=bitcoin
+$ docker network create mutt-network
+```
+
+Now, I 'll build the Docker image:
+```
+$ docker build -t exercise_1 .
+```
+This will build the docker image that contains all the code and necessary dependencies. Under the hood, it is installing the poetry app.
+
+To execute the app for a single date and single coin, we should run the following
+
+```
+$ docker run --rm --name=container_exercise_1 --network=mutt-network -v=$PWD/exercise_1/output:/app/exercise_1/output exercise_1 "--date=2022-04-20" "--coin=bitcoin"
 ```
 
 To set up the cron job, I will execute it as a Python script (I didn't find the way to execute the Poetry app inside the crontab tab). So first I install 2 dependencies
@@ -137,45 +138,48 @@ I'll add some configuration on the `pyproject.toml` file:
 line-length = 79
 ```
 
-Also, here, to install it, just run:
-```
-$ poetry install
-```
-
-
 Now we can run some commands to clean the code:
 ```
 $ poetry run isort exercise_2
 $ poetry run black exercise_2
 ```
 
-
 To set up the PostgreSQL database, I'll use the [official Docker Image](https://hub.docker.com/_/postgres?tab=description)
-```
-$ docker pull postgres:13.0
-$ docker run --name mutt_db -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:13.0
-```
-The default `POSTGRES_USER` and `POSTGRES_DB` are both `postgres`.
 
-Now , I run `exercise_2/create_tables.py` to create 2 tables:
-- `coin_raw`
-- `coin_aggregated`
+I have created a `docker-compose.yml` which creates the DB and executes `create_tables.py` script to create the necessary tables:
+```
+$ cd exercise_2/db
+$ docker-compose up
+```
 
-```
-$ poetry run python exercise_2/db/create_tables.py
-```
+The configuration for the DB is the following:
+- `username`: `postgres`
+- `password`: `postgres`
+- `db`: `postgres`
+- `host`: `localhost` (or `mutt-db` if executing from inside the created network)
+- `port`: `5432`
+
 
 I added a new Boolean parameter on `main.py` called `store_data_on_db`, in case is `False`, it is just the same as the old `main.py` script. But in case is `True`, data is stored on both tables: `coin_raw` and `coin_aggregated`.
 So the logic is as follows:
 - for `coin_raw`, it will store on the DB every new combination of `coin_id` and `date`. It will not do anything if the combination `coin_id` and `date` is already on the DB, not even update the value.
 - for `coin_aggregated`, it will first delete the record from the month belonging to the selected date, it will compute the max/min values again with the new data, and will store this new value.
 
+
+Now we can build the Docker image that contains all the code (while on `test-exam/exercise_2` directory):
+```
+$ docker build -t exercise_2 .
+```
+
 To populate the tables from values since 2020-01-01, I execute the following commands:
 
+
 ```
-$ poetry run python exercise_2/main.py --coin=bitcoin --start_date=2020-01-01 --end_date=2022-04-14 --store_data_on_db=True
-$ poetry run python exercise_2/main.py --coin=ethereum --start_date=2020-01-01 --end_date=2022-04-14 --store_data_on_db=True
-$ poetry run python exercise_2/main.py --coin=cardano --start_date=2020-01-01 --end_date=2022-04-14 --store_data_on_db=True
+$ docker run --rm --name=container_exercise_2 --network=mutt-network -v=$PWD/exercise_2/output:/app/exercise_2/output exercise_2 "--coin=bitcoin" "--start_date=2020-01-01" "--end_date=2022-04-14" "--store_data_on_db=True"
+
+$ docker run --rm --name=container_exercise_2 --network=mutt-network -v=$PWD/exercise_2/output:/app/exercise_2/output exercise_2 "--coin=ethereum" "--start_date=2020-01-01" "--end_date=2022-04-14" "--store_data_on_db=True"
+
+$ docker run --rm --name=container_exercise_2 --network=mutt-network -v=$PWD/exercise_2/output:/app/exercise_2/output exercise_2 "--coin=cardano" "--start_date=2020-01-01" "--end_date=2022-04-14" "--store_data_on_db=True"
 ```
 
 ## Exercise 3
@@ -219,7 +223,7 @@ On this one I assumed that the "the current market cap" is the market cap from t
 
 ## Exercise 4
 
-For Exersice 4 I am going to create another Poetry app, and install all the dependencies and Jupyter to use a Notebook. As on the previuous exercises, I initiate teh app by just running the followoing command:
+For Exercise 4 I am going to create another Poetry app, and install all the dependencies and Jupyter to use a Notebook. As on the previuous exercises, I initiate teh app by just running the followoing command:
 
 ```
 $ poetry init
@@ -256,16 +260,11 @@ $ poetry add holidays==0.13
 $ poetry add scikit-learn==0.24.2
 ```
 
-Again, to install it, just run:
-```
-$ poetry install
-```
-
-
-Now I can launch a Notebook and start working there:
+Now we can build the Docker image, and launch a Jupyter Notebook from inside the container:
 
 ```
-$ poetry run jupyter-notebook
+$ docker build -t exercise_4 .
+$ docker run --rm --name=container_exercise_4 --network=mutt-network -v=$PWD/exercise_4:/app/exercise_4 -p 8888:8888 exercise_4
 ```
 
 On this exercise, we can plot the last 30 days point prices of each of the coins, resulting on the following plots

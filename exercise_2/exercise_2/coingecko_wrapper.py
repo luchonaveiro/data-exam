@@ -64,25 +64,16 @@ class CoinGeckoWrapper:
             f"Fetching {self.coin} data for the {date.date()} on {URL} ..."
         )
         resp = requests.get(URL)
-        try:
-            if resp.status_code == 200:
-                data = resp.json()
-                json_data = json.dumps(data)
-                logger.info(f"Data retrieved OK")
+        if resp.status_code == 200:
+            data = resp.json()
+            json_data = json.dumps(data)
+            logger.info(f"Data retrieved OK")
 
-            else:
-                logger.error(
-                    f"Error {resp.status_code} ({resp.reason}) while fetching {self.coin} data for the {date.date()} on {URL}"
-                )
-                logger.error(resp.text)
-                raise ValueError(
-                    f"Error while fetching {self.coin} data for the {date.date()} on {URL}"
-                )
-        except Exception as e:
+        else:
             logger.error(
-                f"Error while fetching {self.coin} data for the {date.date()} on {URL}"
+                f"Error {resp.status_code} ({resp.reason}) while fetching {self.coin} data for the {date.date()} on {URL}"
             )
-            logger.error(e)
+            logger.error(resp.text)
             raise ValueError(
                 f"Error while fetching {self.coin} data for the {date.date()} on {URL}"
             )
