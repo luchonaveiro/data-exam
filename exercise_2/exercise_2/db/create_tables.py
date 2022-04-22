@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 # POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 
 POSTGRES_DB = "postgres"
-POSTGRES_HOST = "localhost"
+POSTGRES_HOST = "mutt-db"  # "localhost"
 POSTGRES_USER = "postgres"
 POSTGRES_PASSWORD = "postgres"
 

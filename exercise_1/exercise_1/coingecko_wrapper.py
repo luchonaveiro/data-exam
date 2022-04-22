@@ -59,13 +59,17 @@ class CoinGeckoWrapper:
                     f"Error {resp.status_code} ({resp.reason}) while fetching {self.coin} data for the {date.date()} on {URL}"
                 )
                 logger.error(resp.text)
-                raise ValueError(f"Error while fetching {self.coin} data for the {date.date()} on {URL}")
+                raise ValueError(
+                    f"Error while fetching {self.coin} data for the {date.date()} on {URL}"
+                )
         except Exception as e:
             logger.error(
                 f"Error while fetching {self.coin} data for the {date.date()} on {URL}"
             )
             logger.error(e)
-            raise ValueError(f"Error while fetching {self.coin} data for the {date.date()} on {URL}")
+            raise ValueError(
+                f"Error while fetching {self.coin} data for the {date.date()} on {URL}"
+            )
 
         self.json_data = json_data
 
@@ -76,7 +80,9 @@ class CoinGeckoWrapper:
             path (str): path where to store the CoinGecko API JSON response
         """
         if not self.json_data:
-            raise ValueError('Please execute .fetch_api_data(DATE) with the desired date!')
+            raise ValueError(
+                "Please execute .fetch_api_data(DATE) with the desired date!"
+            )
 
         with open(path, "w") as file:
             file.write(self.json_data)

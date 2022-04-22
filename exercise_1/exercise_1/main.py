@@ -1,8 +1,8 @@
 import argparse
 import datetime
 import logging
-from typing import List
 import os
+from typing import List
 
 from coingecko_wrapper import CoinGeckoWrapper
 from tqdm import tqdm
@@ -21,10 +21,14 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
-    "--start_date", type=str, help="Date since you want to retrieve data (included)"
+    "--start_date",
+    type=str,
+    help="Date since you want to retrieve data (included)",
 )
 parser.add_argument(
-    "--end_date", type=str, help="Date until you want to retrieve data (included)"
+    "--end_date",
+    type=str,
+    help="Date until you want to retrieve data (included)",
 )
 args = parser.parse_args()
 
@@ -38,7 +42,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-BASE_OUTPUT_PATH = os.path.join(os.path.dirname(__file__), 'output')
+BASE_OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "output")
 
 if not os.path.isdir(BASE_OUTPUT_PATH):
     os.mkdir(BASE_OUTPUT_PATH)
@@ -71,7 +75,9 @@ def main():
     if not args.date:
         if not args.start_date:
             if not args.end_date:
-                raise ValueError("Please specify a date or a range with start_date and end_date!")
+                raise ValueError(
+                    "Please specify a date or a range with start_date and end_date!"
+                )
 
     if args.date:
         date = datetime.datetime.strptime(args.date, "%Y-%m-%d")

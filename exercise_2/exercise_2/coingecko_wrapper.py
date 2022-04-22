@@ -35,7 +35,7 @@ class CoinGeckoWrapper:
     COINGECKO_BASE_URL = "https://api.coingecko.com/api/v3/coins"
 
     POSTGRES_DB = "postgres"
-    POSTGRES_HOST = "localhost"
+    POSTGRES_HOST = "mutt-db"  # "localhost"
     POSTGRES_USER = "postgres"
     POSTGRES_PASSWORD = "postgres"
 
@@ -75,14 +75,17 @@ class CoinGeckoWrapper:
                     f"Error {resp.status_code} ({resp.reason}) while fetching {self.coin} data for the {date.date()} on {URL}"
                 )
                 logger.error(resp.text)
-                raise ValueError(f"Error while fetching {self.coin} data for the {date.date()} on {URL}")
+                raise ValueError(
+                    f"Error while fetching {self.coin} data for the {date.date()} on {URL}"
+                )
         except Exception as e:
             logger.error(
                 f"Error while fetching {self.coin} data for the {date.date()} on {URL}"
             )
             logger.error(e)
-            raise ValueError(f"Error while fetching {self.coin} data for the {date.date()} on {URL}")
-
+            raise ValueError(
+                f"Error while fetching {self.coin} data for the {date.date()} on {URL}"
+            )
 
         self.json_data = json_data
 
@@ -93,7 +96,9 @@ class CoinGeckoWrapper:
             path (str): path where to store the CoinGecko API JSON response
         """
         if not self.json_data:
-            raise ValueError('Please execute .fetch_api_data(DATE) with the desired date!')
+            raise ValueError(
+                "Please execute .fetch_api_data(DATE) with the desired date!"
+            )
 
         with open(path, "w") as file:
             file.write(self.json_data)
@@ -104,7 +109,9 @@ class CoinGeckoWrapper:
         That table has coin_id, date, price, response as columns.
         """
         if not self.json_data:
-            raise ValueError('Please execute .fetch_api_data(DATE) with the desired date!')
+            raise ValueError(
+                "Please execute .fetch_api_data(DATE) with the desired date!"
+            )
 
         coin_raw_data = [
             [
@@ -139,10 +146,14 @@ class CoinGeckoWrapper:
         That table has coin_id, year_month, max_price, min_price as columns.
         """
         if not self.json_data:
-            raise ValueError('Please execute .fetch_api_data(DATE) with the desired date!')
+            raise ValueError(
+                "Please execute .fetch_api_data(DATE) with the desired date!"
+            )
 
         current_moth = self.date.strftime("%Y-%m-01")
-        following_month = (self.date + relativedelta(months=1)).strftime("%Y-%m-01")
+        following_month = (self.date + relativedelta(months=1)).strftime(
+            "%Y-%m-01"
+        )
 
         sql_cli = SqLiteClient(self.DB_URI)
 

@@ -2,13 +2,7 @@
 
 ## Exercise 1
 
-I will set up my environment using Poetry, to manage all the dependences and enable a reproduceable command line Python app. First, we should install poetry
-```
-$ pip3 install poetry==1.1.7
-$ pip3 install poetry-core==1.0.4
-```
-
-Now, I will instantiate the first project:
+I will instantiate the first project:
 
 ```
 $ cd exercise_1
@@ -50,21 +44,28 @@ I'll add some configuration on the `pyproject.toml` file:
 line-length = 79
 ```
 
-Once somebody clones this repo, the only requirement to run the app is having Python 3.8 or higher installed. To install all the app's dependencies, you can run:
-```
-$ poetry install
-```
-
 Now we can run some commands to clean the code:
 ```
 $ poetry run isort exercise_1
 $ poetry run black exercise_1
 ```
 
-We can execute some examples to check if everything is fine:
+To build this project, I will first crate a network where all the Docker containes will run:
 
 ```
-$ poetry run python exercise_1/main.py --date=2022-04-10 --coin=bitcoin
+$ docker network create mutt-network
+```
+
+Now, I 'll build the Docker image:
+```
+$ docker build -t exercise_1 .
+```
+This will build the docker image that contains all the code and necessary dependencies. Under the hood, it is installing the poetry app.
+
+To execute the app for a single date and single coin, we should run the following
+
+```
+$ docker run --rm --name=container_exercise_1 --network=mutt-network -v=$PWD/exercise_1/output:/app/exercise_1/output exercise_1 "--date=2022-04-20" "--coin=bitcoin"
 ```
 
 To set up the cron job, I will execute it as a Python script (I didn't find the way to execute the Poetry app inside the crontab tab). So first I install 2 dependencies
@@ -137,25 +138,19 @@ I'll add some configuration on the `pyproject.toml` file:
 line-length = 79
 ```
 
-Also, here, to install it, just run:
-```
-$ poetry install
-```
-
-
 Now we can run some commands to clean the code:
 ```
 $ poetry run isort exercise_2
 $ poetry run black exercise_2
 ```
 
-
 To set up the PostgreSQL database, I'll use the [official Docker Image](https://hub.docker.com/_/postgres?tab=description)
 ```
 $ docker pull postgres:13.0
-$ docker run --name mutt_db -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:13.0
+$ docker run --rm --name mutt-db --network=mutt-network -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:13.0
 ```
 The default `POSTGRES_USER` and `POSTGRES_DB` are both `postgres`.
+
 
 Now , I run `exercise_2/create_tables.py` to create 2 tables:
 - `coin_raw`
