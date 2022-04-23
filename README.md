@@ -260,7 +260,7 @@ $ poetry add holidays==0.13
 $ poetry add scikit-learn==0.24.2
 ```
 
-Now we can build the Docker image, and launch a Jupyter Notebook from inside the container:
+Now we can build the Docker image, and launch a Jupyter Notebook from inside the container and expose it on `localhost:8888`:
 
 ```
 $ docker build -t exercise_4 .
