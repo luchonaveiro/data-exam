@@ -287,4 +287,3 @@ After running the model for each of the three models, we can conlcude that this 
 ![](exercise_4/exercise_4/model_output/bitcoin_model_plot.png)
 ![](exercise_4/exercise_4/model_output/ethereum_model_plot.png)
 ![](exercise_4/exercise_4/model_output/cardano_model_plot.png)
-
