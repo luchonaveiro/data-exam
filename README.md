@@ -1,4 +1,4 @@
-# Mutt Data Exam
+# Data Exam
 [![Generic badge](https://img.shields.io/badge/Python-3.8-blue.svg)](https://www.python.org/)
 [![Generic badge](https://img.shields.io/badge/PostgreSQL-13-blue.svg)](https://www.postgresql.org/)
 [![Generic badge](https://img.shields.io/badge/Poetry-1.1.7-blue.svg)](https://python-poetry.org/)
